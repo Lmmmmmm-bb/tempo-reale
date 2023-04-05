@@ -3,15 +3,6 @@ const colorMode = useColorMode();
 
 const isDarkMode = computed(() => colorMode.value === 'dark');
 
-useHead({
-  meta: [
-    {
-      name: 'theme-color',
-      content: () => isDarkMode.value ? '#222' : '#fff',
-    },
-  ],
-});
-
 const toggleDark = () => {
   colorMode.preference = isDarkMode.value ? 'light' : 'dark';
 };
