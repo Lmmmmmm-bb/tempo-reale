@@ -27,15 +27,14 @@ const socket = useWebSocket<string>(`${socketDomain}/websocket/${id}`, {
     }
 
     if (data.type === MessageTypeEnum.Offer) {
-      await initStream();
       await peerConnection.value.setRemoteDescription(data.offer);
       const answer = await peerConnection.value.createAnswer();
       await peerConnection.value.setLocalDescription(answer);
       send({ id, type: MessageTypeEnum.Answer, answer });
     } else if (data.type === MessageTypeEnum.Answer) {
-      peerConnection.value.setRemoteDescription(data.answer);
+      await peerConnection.value.setRemoteDescription(data.answer);
     } else if (data.type === MessageTypeEnum.Candidate) {
-      peerConnection.value.addIceCandidate(data.candidate);
+      await peerConnection.value.addIceCandidate(data.candidate);
     }
   },
 });
@@ -45,14 +44,14 @@ function send(data: MessageBody) {
 }
 
 async function handleStartClick() {
-  await initStream();
   const offer = await peerConnection.value.createOffer();
   await peerConnection.value.setLocalDescription(offer);
   send({ id, type: MessageTypeEnum.Offer, offer });
 }
 
 // setup peer connection listeners
-onMounted(() => {
+onMounted(async () => {
+  await initStream();
   peerConnection.value.addEventListener('track', (e) => {
     if (audioRef.value) {
       audioRef.value.srcObject = e.streams[0];
