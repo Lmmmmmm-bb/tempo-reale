@@ -1,15 +1,13 @@
-export const initRTC = async () => {
-  const peer = new RTCPeerConnection();
-  const offer = await peer.createOffer();
-  await peer.setLocalDescription(offer);
+export const initPeerConnection = () => {
+  const peer = new RTCPeerConnection({
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' },
+      { urls: 'stun:stun3.l.google.com:19302' },
+      { urls: 'stun:stun4.l.google.com:19302' },
+    ],
+  });
 
-  return { peer, offer };
-};
-
-export const connectRemote = async (peer: RTCPeerConnection, offer: RTCSessionDescriptionInit) => {
-  await peer.setRemoteDescription(offer);
-  const answer = await peer.createAnswer();
-  await peer.setLocalDescription(answer);
-
-  return answer;
+  return peer;
 };
