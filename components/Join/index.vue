@@ -1,10 +1,57 @@
 <script setup lang="ts">
 import { nanoid } from 'nanoid';
 
-const id = shallowRef(nanoid());
+import type { MessageBody } from '~/types/socket';
+
+import { socketDomain } from './config';
+
+const id = nanoid();
 const audioRef = ref<HTMLAudioElement>();
 const peerConnection = shallowRef(initPeerConnection());
 
+// request media and add to peer connection
+const initStream = async () => {
+  const stream = await requestMedia();
+  stream.getTracks().forEach(track =>
+    peerConnection.value.addTrack(track, stream),
+  );
+};
+
+const socket = useWebSocket<string>(`${socketDomain}/websocket/${id}`, {
+  onMessage: async (_, e) => {
+    const data: MessageBody = JSON.parse(e.data);
+
+    // ignore self messages
+    if (data.id === id) {
+      return;
+    }
+
+    if (data.type === MessageTypeEnum.Offer) {
+      await initStream();
+      await peerConnection.value.setRemoteDescription(data.offer);
+      const answer = await peerConnection.value.createAnswer();
+      await peerConnection.value.setLocalDescription(answer);
+      send({ id, type: MessageTypeEnum.Answer, answer });
+    } else if (data.type === MessageTypeEnum.Answer) {
+      peerConnection.value.setRemoteDescription(data.answer);
+    } else if (data.type === MessageTypeEnum.Candidate) {
+      peerConnection.value.addIceCandidate(data.candidate);
+    }
+  },
+});
+
+function send(data: MessageBody) {
+  socket.send(JSON.stringify(data));
+}
+
+async function handleStartClick() {
+  await initStream();
+  const offer = await peerConnection.value.createOffer();
+  await peerConnection.value.setLocalDescription(offer);
+  send({ id, type: MessageTypeEnum.Offer, offer });
+}
+
+// setup peer connection listeners
 onMounted(() => {
   peerConnection.value.addEventListener('track', (e) => {
     if (audioRef.value) {
@@ -14,53 +61,14 @@ onMounted(() => {
   });
 
   peerConnection.value.addEventListener('icecandidate', (e) => {
-    // eslint-disable-next-line no-console
-    console.log(e.candidate);
-    e.candidate && send({ id: id.value, type: 'candidate', candidate: e.candidate });
+    e.candidate && send({ id, type: MessageTypeEnum.Candidate, candidate: e.candidate });
   });
 });
-
-// https://github.com/shushushv/webrtc-p2p/blob/master/client/p2p.html
-const socket = useWebSocket(`wss://vcc.zeabur.app/websocket/${id.value}`, {
-  onMessage: async (_, e) => {
-    const data = JSON.parse(e.data);
-    if (data.id === id.value) {
-      return;
-    }
-
-    if (data.type === 'offer') {
-      const stream = await initMediaStream();
-      stream.getTracks().forEach(track => peerConnection.value.addTrack(track, stream));
-      await peerConnection.value.setRemoteDescription(data.offer);
-      const answer = await peerConnection.value.createAnswer();
-      await peerConnection.value.setLocalDescription(answer);
-      send({ id: id.value, type: 'answer', answer });
-    } else if (data.type === 'answer') {
-      peerConnection.value.setRemoteDescription(data.answer);
-    } else if (data.type === 'candidate') {
-      peerConnection.value.addIceCandidate(data.candidate);
-    }
-  },
-});
-
-function send(data: any) {
-  socket.send(JSON.stringify(data));
-}
-
-async function handleJoin() {
-  const stream = await initMediaStream();
-  stream.getTracks().forEach(track =>
-    peerConnection.value.addTrack(track, stream),
-  );
-  const offer = await peerConnection.value.createOffer();
-  await peerConnection.value.setLocalDescription(offer);
-  send({ id: id.value, type: 'offer', offer });
-}
 </script>
 
 <template>
   <audio ref="audioRef" />
-  <button @click="handleJoin">
+  <button @click="handleStartClick">
     Start
   </button>
 </template>

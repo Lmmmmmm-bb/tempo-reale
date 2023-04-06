@@ -1,7 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  runtimeConfig: {
+    domain: 'wss://vcc.zeabur.app',
+  },
   devServer: {
     port: 5173,
+  },
+  imports: {
+    dirs: ['types'],
   },
   modules: [
     '@nuxtjs/google-fonts',
@@ -33,12 +39,12 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: 'en',
       },
-      title: 'Nuxt Starter',
+      title: 'rtc',
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/nuxt.svg' },
       ],
       meta: [
-        { name: 'description', content: 'Nuxt3 starter' },
+        { name: 'description', content: 'rtc' },
       ],
     },
   },
