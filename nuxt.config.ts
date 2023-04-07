@@ -40,6 +40,7 @@ export default defineNuxtConfig({
     head: {
       htmlAttrs: {
         lang: 'en',
+        translate: 'no',
       },
       title: 'rtc',
       link: [
