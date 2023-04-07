@@ -3,9 +3,8 @@ import { nanoid } from 'nanoid';
 
 import type { MessageBody } from '~/types/socket';
 
-import { socketDomain } from './config';
-
 const id = nanoid();
+const runtimeConfig = useRuntimeConfig();
 const audioRef = ref<HTMLAudioElement>();
 const peerConnection = shallowRef(initPeerConnection());
 
@@ -17,7 +16,7 @@ const initStream = async () => {
   );
 };
 
-const socket = useWebSocket<string>(`${socketDomain}/websocket/${id}`, {
+const socket = useWebSocket<string>(`${runtimeConfig.public.domain}/websocket/${id}`, {
   onMessage: async (_, e) => {
     const data: MessageBody = JSON.parse(e.data);
 

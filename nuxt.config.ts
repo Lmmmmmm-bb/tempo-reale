@@ -1,7 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   runtimeConfig: {
-    domain: 'wss://vcc.zeabur.app',
+    public: {
+      domain: 'wss://vcc.zeabur.app',
+    },
   },
   devServer: {
     port: 5173,
