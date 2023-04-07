@@ -61,6 +61,11 @@ onMounted(async () => {
   peerConnection.value.addEventListener('icecandidate', (e) => {
     e.candidate && send({ id, type: MessageTypeEnum.Candidate, candidate: e.candidate });
   });
+
+  peerConnection.value.addEventListener('icecandidateerror', (e) => {
+    // eslint-disable-next-line no-console
+    console.log('ICE Candidate Error', e);
+  });
 });
 </script>
 
