@@ -3,7 +3,7 @@ import type { AnswerMessage, CandidateMessage, OfferMessage } from '~/types/sock
 
 const connectionMap = ref(new Map<string, RTCPeerConnection>());
 const socket = shallowRef(initSocket());
-const audioRef = ref<HTMLAudioElement>();
+const audioWrapperRef = ref<HTMLAudioElement>();
 
 const initConnection = async (to: string) => {
   const stream = await requestMedia();
@@ -14,19 +14,18 @@ const initConnection = async (to: string) => {
   );
 
   peer.addEventListener('track', (e) => {
-    if (audioRef.value) {
-      audioRef.value.srcObject = e.streams[0];
-      audioRef.value.play();
-    }
+    const audio = document.getElementById(to);
+    audio?.remove();
+
+    const _audio = document.createElement('audio');
+    _audio.srcObject = e.streams[0];
+    _audio.autoplay = true;
+    _audio.setAttribute('id', to);
+    audioWrapperRef.value?.appendChild(_audio);
   });
 
   peer.addEventListener('icecandidate', (e) => {
     e.candidate && socket.value.onSendCandidate(to, e.candidate);
-  });
-
-  peer.addEventListener('icecandidateerror', (e) => {
-    // eslint-disable-next-line no-console
-    console.log('ICE Candidate Error', e);
   });
 
   return peer;
@@ -37,6 +36,8 @@ onMounted(() => {
     const current = connectionMap.value.get(id);
     connectionMap.value.delete(id);
     current?.close();
+    const audio = document.getElementById(id);
+    audio?.remove();
   });
 
   socket.value.socket.on(MessageTypeEnum.All, (data: string[]) =>
@@ -68,11 +69,9 @@ onMounted(() => {
     const current = connectionMap.value.get(from);
     await current?.addIceCandidate(candidate);
   });
-
-  socket.value.onGetAll();
 });
 </script>
 
 <template>
-  <audio ref="audioRef" />
+  <div ref="audioWrapperRef" />
 </template>

@@ -3,10 +3,6 @@ import { io } from 'socket.io-client';
 export const initSocket = () => {
   const socket = io('wss://rtcc.zeabur.app');
 
-  const onGetAll = () => {
-    socket.emit(MessageTypeEnum.All);
-  };
-
   const onSendOffer = (to: string, offer: RTCSessionDescriptionInit) => {
     socket.emit(MessageTypeEnum.Offer, { to, offer });
   };
@@ -21,7 +17,6 @@ export const initSocket = () => {
 
   return {
     socket,
-    onGetAll,
     onSendOffer,
     onSendAnswer,
     onSendCandidate,
