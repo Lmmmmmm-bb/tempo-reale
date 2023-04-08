@@ -1,77 +1,78 @@
 <script setup lang="ts">
-import { nanoid } from 'nanoid';
+import type { AnswerMessage, CandidateMessage, OfferMessage } from '~/types/socket';
 
-import type { MessageBody } from '~/types/socket';
-
-const id = nanoid();
-const runtimeConfig = useRuntimeConfig();
+const connectionMap = ref(new Map<string, RTCPeerConnection>());
+const socket = shallowRef(initSocket());
 const audioRef = ref<HTMLAudioElement>();
-const peerConnection = shallowRef(initPeerConnection());
 
-// request media and add to peer connection
-const initStream = async () => {
+const initConnection = async (to: string) => {
   const stream = await requestMedia();
+  const peer = createPeerConnection();
+  connectionMap.value.set(to, peer);
   stream.getTracks().forEach(track =>
-    peerConnection.value.addTrack(track, stream),
+    peer.addTrack(track, stream),
   );
-};
 
-const socket = useWebSocket<string>(`${runtimeConfig.public.domain}/websocket/${id}`, {
-  onMessage: async (_, e) => {
-    const data: MessageBody = JSON.parse(e.data);
-
-    // ignore self messages
-    if (data.id === id) {
-      return;
-    }
-
-    if (data.type === MessageTypeEnum.Offer) {
-      await peerConnection.value.setRemoteDescription(data.offer);
-      const answer = await peerConnection.value.createAnswer();
-      await peerConnection.value.setLocalDescription(answer);
-      send({ id, type: MessageTypeEnum.Answer, answer });
-    } else if (data.type === MessageTypeEnum.Answer) {
-      await peerConnection.value.setRemoteDescription(data.answer);
-    } else if (data.type === MessageTypeEnum.Candidate) {
-      await peerConnection.value.addIceCandidate(data.candidate);
-    }
-  },
-});
-
-function send(data: MessageBody) {
-  socket.send(JSON.stringify(data));
-}
-
-async function handleStartClick() {
-  const offer = await peerConnection.value.createOffer();
-  await peerConnection.value.setLocalDescription(offer);
-  send({ id, type: MessageTypeEnum.Offer, offer });
-}
-
-// setup peer connection listeners
-onMounted(async () => {
-  await initStream();
-  peerConnection.value.addEventListener('track', (e) => {
+  peer.addEventListener('track', (e) => {
     if (audioRef.value) {
       audioRef.value.srcObject = e.streams[0];
       audioRef.value.play();
     }
   });
 
-  peerConnection.value.addEventListener('icecandidate', (e) => {
-    e.candidate && send({ id, type: MessageTypeEnum.Candidate, candidate: e.candidate });
+  peer.addEventListener('icecandidate', (e) => {
+    e.candidate && socket.value.onSendCandidate(to, e.candidate);
   });
 
-  peerConnection.value.addEventListener('icecandidateerror', (e) => {
+  peer.addEventListener('icecandidateerror', (e) => {
     // eslint-disable-next-line no-console
     console.log('ICE Candidate Error', e);
   });
+
+  return peer;
+};
+
+onMounted(() => {
+  socket.value.socket.on(MessageTypeEnum.Leave, (id: string) => {
+    const current = connectionMap.value.get(id);
+    connectionMap.value.delete(id);
+    current?.close();
+  });
+
+  socket.value.socket.on(MessageTypeEnum.All, (data: string[]) =>
+    data.forEach(async (id) => {
+      const peer = await initConnection(id);
+      const offer = await peer.createOffer();
+      await peer.setLocalDescription(offer);
+      socket.value.onSendOffer(id, offer);
+    }),
+  );
+
+  socket.value.socket.on(MessageTypeEnum.Offer, async (data: OfferMessage) => {
+    const { from, offer } = data;
+    const current = await initConnection(from);
+    await current.setRemoteDescription(offer);
+    const answer = await current.createAnswer();
+    await current.setLocalDescription(answer);
+    socket.value.onSendAnswer(from, answer);
+  });
+
+  socket.value.socket.on(MessageTypeEnum.Answer, async (data: AnswerMessage) => {
+    const { from, answer } = data;
+    const current = connectionMap.value.get(from);
+    await current?.setRemoteDescription(answer);
+  });
+
+  socket.value.socket.on(MessageTypeEnum.Candidate, async (data: CandidateMessage) => {
+    const { from, candidate } = data;
+    const current = connectionMap.value.get(from);
+    await current?.addIceCandidate(candidate);
+  });
+
+  socket.value.onGetAll();
 });
 </script>
 
 <template>
   <audio ref="audioRef" />
-  <button @click="handleStartClick">
-    Start
-  </button>
 </template>

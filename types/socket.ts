@@ -1,24 +1,29 @@
 export enum MessageTypeEnum {
+  // internal
+  Connection = 'connection',
+  Disconnect = 'disconnect',
+
+  All = 'all',
+  Leave = 'leave',
   Offer = 'offer',
   Answer = 'answer',
   Candidate = 'candidate',
 }
 
-export interface OfferMessage {
-  id: string;
-  type: MessageTypeEnum.Offer;
+interface BaseMessage {
+  from: string;
+  to: string;
+}
+
+export interface OfferMessage extends BaseMessage {
   offer: RTCSessionDescriptionInit;
 }
 
-export interface AnswerMessage {
-  id: string;
-  type: MessageTypeEnum.Answer;
+export interface AnswerMessage extends BaseMessage {
   answer: RTCSessionDescriptionInit;
 }
 
-export interface CandidateMessage {
-  id: string;
-  type: MessageTypeEnum.Candidate;
+export interface CandidateMessage extends BaseMessage {
   candidate: RTCIceCandidateInit;
 }
 

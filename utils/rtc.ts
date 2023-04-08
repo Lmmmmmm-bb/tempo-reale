@@ -6,7 +6,7 @@ const servers: RTCIceServer[] = [
   { urls: 'stun:stun4.l.google.com:19302' },
 ];
 
-export const initPeerConnection = () => {
+export const createPeerConnection = () => {
   const peer = new RTCPeerConnection({
     iceServers: servers,
   });
