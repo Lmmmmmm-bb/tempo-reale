@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 
 export const initSocket = () => {
-  const socket = io('ws://localhost:3000');
+  const socket = io('wss://rtcc.zeabur.app');
 
   const onGetAll = () => {
     socket.emit(MessageTypeEnum.All);
