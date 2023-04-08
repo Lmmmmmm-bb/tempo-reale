@@ -7,7 +7,7 @@
     justify-center
   >
     <ClientOnly>
-      <Join />
+      <Audios />
     </ClientOnly>
     <ThemeToggle />
   </div>
