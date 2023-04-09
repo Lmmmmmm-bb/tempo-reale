@@ -1,9 +1,9 @@
 <script setup lang="ts">
 const audioWrapperRef = ref<HTMLAudioElement>();
 
-const [open, toggle] = useToggle();
+const [open, toggle] = useToggle(true);
 const { count, inc, dec } = useCounter(1);
-usePeerConnection({
+const { toggleMute } = usePeerConnection({
   onTrack: (id, e) => {
     const audio = document.getElementById(id);
     audio?.remove();
@@ -21,12 +21,17 @@ usePeerConnection({
     dec();
   },
 });
+
+const toggleMicrophone = () => {
+  toggleMute(!open.value);
+  toggle();
+};
 </script>
 
 <template>
   <ButtonPrimary
     flex w-24 xl:w-36
-    @click="toggle()"
+    @click="toggleMicrophone"
   >
     <Icon m-auto :name="open ? 'carbon:microphone-off' : 'carbon:microphone'" />
   </ButtonPrimary>

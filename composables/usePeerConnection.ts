@@ -6,17 +6,17 @@ interface UsePeerConnectionParams {
 }
 
 export const usePeerConnection = ({ onTrack, onLeave }: UsePeerConnectionParams) => {
+  const stream = shallowRef<MediaStream>();
   const connectionMap = ref(new Map<string, RTCPeerConnection>());
   const candidateMap = ref(new Map<string, RTCIceCandidateInit[]>());
   const socket = shallowRef(initSocket());
 
   const initConnection = async (to: string) => {
-    const stream = await requestMedia();
     const peer = createPeerConnection();
     connectionMap.value.set(to, peer);
     candidateMap.value.set(to, []);
-    stream.getTracks().forEach(track =>
-      peer.addTrack(track, stream),
+    stream.value!.getTracks().forEach(track =>
+      peer.addTrack(track, stream.value!),
     );
 
     peer.addEventListener('track', (e) => {
@@ -35,6 +35,18 @@ export const usePeerConnection = ({ onTrack, onLeave }: UsePeerConnectionParams)
 
     return peer;
   };
+
+  // muted audio
+  const toggleMute = (enabled: boolean) => {
+    stream.value!.getAudioTracks().forEach(
+      track => track.enabled = enabled,
+    );
+  };
+
+  // request media stream
+  onMounted(async () => {
+    stream.value = await requestMedia();
+  });
 
   onMounted(() => {
     socket.value.socket.on(MessageTypeEnum.Leave, (id: string) => {
@@ -80,6 +92,7 @@ export const usePeerConnection = ({ onTrack, onLeave }: UsePeerConnectionParams)
 
   return {
     socket,
+    toggleMute,
     connectionMap,
   };
 };
