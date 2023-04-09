@@ -1,10 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  runtimeConfig: {
-    public: {
-      domain: 'wss://vcc.zeabur.app',
-    },
-  },
   devServer: {
     port: 5173,
   },
@@ -18,6 +13,7 @@ export default defineNuxtConfig({
     'nuxt-icon',
     '@nuxtjs/device',
     '@vueuse/nuxt',
+    '@nuxt/image-edge',
   ],
   css: [
     '~/index.css',
@@ -44,7 +40,7 @@ export default defineNuxtConfig({
       },
       title: 'rtc',
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/nuxt.svg' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
       ],
       meta: [
         { name: 'description', content: 'rtc' },

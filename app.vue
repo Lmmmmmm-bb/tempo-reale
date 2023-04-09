@@ -4,10 +4,10 @@
     flex
     flex-col
     items-center
-    justify-center
   >
+    <Logo />
     <ClientOnly>
-      <Join />
+      <Audios />
     </ClientOnly>
     <ThemeToggle />
   </div>
