@@ -9,7 +9,7 @@ export const usePeerConnection = ({ onTrack, onLeave }: UsePeerConnectionParams)
   const stream = shallowRef<MediaStream>();
   const connectionMap = ref(new Map<string, RTCPeerConnection>());
   const candidateMap = ref(new Map<string, RTCIceCandidateInit[]>());
-  const socket = shallowRef(initSocket());
+  const socket = shallowRef();
 
   const initConnection = async (to: string) => {
     const peer = createPeerConnection();
@@ -43,12 +43,10 @@ export const usePeerConnection = ({ onTrack, onLeave }: UsePeerConnectionParams)
     );
   };
 
-  // request media stream
   onMounted(async () => {
+    // request media stream
     stream.value = await requestMedia();
-  });
-
-  onMounted(() => {
+    socket.value = initSocket();
     socket.value.socket.on(MessageTypeEnum.Leave, (id: string) => {
       onLeave(id);
       const current = connectionMap.value.get(id);
