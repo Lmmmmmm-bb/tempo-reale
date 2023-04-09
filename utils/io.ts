@@ -11,8 +11,8 @@ export const initSocket = () => {
     socket.emit(MessageTypeEnum.Answer, { to, answer });
   };
 
-  const onSendCandidate = (to: string, candidate: RTCIceCandidate) => {
-    socket.emit(MessageTypeEnum.Candidate, { to, candidate });
+  const onSendCandidate = (to: string, candidates: RTCIceCandidateInit[]) => {
+    socket.emit(MessageTypeEnum.Candidate, { to, candidates });
   };
 
   return {

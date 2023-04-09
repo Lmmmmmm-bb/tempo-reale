@@ -24,7 +24,7 @@ export interface AnswerMessage extends BaseMessage {
 }
 
 export interface CandidateMessage extends BaseMessage {
-  candidate: RTCIceCandidateInit;
+  candidates: RTCIceCandidateInit[];
 }
 
 export type MessageBody = OfferMessage | AnswerMessage | CandidateMessage;

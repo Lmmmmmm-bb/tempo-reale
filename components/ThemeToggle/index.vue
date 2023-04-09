@@ -9,7 +9,7 @@ const toggleDark = () => {
 </script>
 
 <template>
-  <ButtonGhost aria-label="Toggle Color Mode" @click="toggleDark">
+  <ButtonSecondary aria-label="Toggle Color Mode" @click="toggleDark">
     <Icon :name="isDarkMode ? 'carbon:moon' : 'carbon:sun'" />
-  </ButtonGhost>
+  </ButtonSecondary>
 </template>
