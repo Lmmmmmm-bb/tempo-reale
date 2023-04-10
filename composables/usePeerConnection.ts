@@ -1,21 +1,21 @@
 import type { AnswerMessage, CandidateMessage, OfferMessage } from '~/types/socket';
 
 interface UsePeerConnectionParams {
+  stream: Ref<MediaStream | undefined>;
   onTrack: (id: string, e: RTCTrackEvent) => void;
   onLeave: (id: string) => void;
 }
 
-export const usePeerConnection = ({ onTrack, onLeave }: UsePeerConnectionParams) => {
-  const stream = shallowRef<MediaStream>();
+export const usePeerConnection = ({ stream, onTrack, onLeave }: UsePeerConnectionParams) => {
   const connectionMap = ref(new Map<string, RTCPeerConnection>());
   const candidateMap = ref(new Map<string, RTCIceCandidateInit[]>());
-  const socket = shallowRef();
+  const socket = shallowRef<ReturnType<typeof initSocket>>();
 
   const initConnection = async (to: string) => {
     const peer = createPeerConnection();
     connectionMap.value.set(to, peer);
     candidateMap.value.set(to, []);
-    stream.value!.getTracks().forEach(track =>
+    stream.value?.getTracks().forEach(track =>
       peer.addTrack(track, stream.value!),
     );
 
@@ -26,7 +26,7 @@ export const usePeerConnection = ({ onTrack, onLeave }: UsePeerConnectionParams)
     peer.addEventListener('icegatheringstatechange', (e) => {
       const { iceGatheringState } = e.target as RTCPeerConnection;
       iceGatheringState === 'complete'
-        && socket.value.onSendCandidate(to, candidateMap.value.get(to) ?? []);
+        && socket.value?.onSendCandidate(to, candidateMap.value.get(to) ?? []);
     });
 
     peer.addEventListener('icecandidate', (e) => {
@@ -36,16 +36,7 @@ export const usePeerConnection = ({ onTrack, onLeave }: UsePeerConnectionParams)
     return peer;
   };
 
-  // muted audio
-  const toggleMute = (enabled: boolean) => {
-    stream.value!.getAudioTracks().forEach(
-      track => track.enabled = enabled,
-    );
-  };
-
-  onMounted(async () => {
-    // request media stream
-    stream.value = await requestMedia();
+  const connect = () => {
     socket.value = initSocket();
     socket.value.socket.on(MessageTypeEnum.Leave, (id: string) => {
       onLeave(id);
@@ -60,7 +51,7 @@ export const usePeerConnection = ({ onTrack, onLeave }: UsePeerConnectionParams)
         const peer = await initConnection(id);
         const offer = await peer.createOffer();
         await peer.setLocalDescription(offer);
-        socket.value.onSendOffer(id, offer);
+        socket.value?.onSendOffer(id, offer);
       }
     });
 
@@ -70,7 +61,7 @@ export const usePeerConnection = ({ onTrack, onLeave }: UsePeerConnectionParams)
       await current.setRemoteDescription(offer);
       const answer = await current.createAnswer();
       await current.setLocalDescription(answer);
-      socket.value.onSendAnswer(from, answer);
+      socket.value?.onSendAnswer(from, answer);
     });
 
     socket.value.socket.on(MessageTypeEnum.Answer, async (data: AnswerMessage) => {
@@ -86,11 +77,11 @@ export const usePeerConnection = ({ onTrack, onLeave }: UsePeerConnectionParams)
         await current?.addIceCandidate(candidate);
       }
     });
-  });
+  };
 
   return {
+    connect,
     socket,
-    toggleMute,
     connectionMap,
   };
 };

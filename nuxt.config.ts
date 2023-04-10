@@ -15,6 +15,9 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@nuxt/image-edge',
   ],
+  build: {
+    transpile: ['vue-sonner'],
+  },
   css: [
     '~/index.css',
     '@unocss/reset/tailwind.css',
