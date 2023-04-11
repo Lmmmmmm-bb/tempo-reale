@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { Toaster, toast } from 'vue-sonner';
+import { Toaster } from 'vue-sonner';
 
 const stream = ref<MediaStream>();
 const audioWrapperRef = ref<HTMLAudioElement>();
 
 const colorMode = useColorMode();
-const [isMuted, toggleIsMuted] = useToggle(true);
 const { target, targetStyle } = useLogoParallax();
 const { connect } = usePeerConnection({
   stream,
@@ -31,19 +30,6 @@ const handleGetStream = (mediaStream: MediaStream) => {
     connect();
   }
 };
-
-const handleMuted = () => {
-  if (stream.value) {
-    stream.value.getAudioTracks().forEach(
-      track => track.enabled = isMuted.value,
-    );
-    toggleIsMuted();
-  } else {
-    toast('No Microphone Permission', {
-      description: 'Please allow microphone access first.',
-    });
-  }
-};
 </script>
 
 <template>
@@ -60,14 +46,7 @@ const handleMuted = () => {
     </div>
     <div flex>
       <MediaRequest @on-media="handleGetStream" />
-      <ButtonPrimary
-        flex
-        mx-2 w-24 xl:w-36
-        transition-width duration-500 ease-out
-        @click="handleMuted"
-      >
-        <Icon m-auto :name="isMuted ? 'carbon:microphone' : 'carbon:microphone-off'" />
-      </ButtonPrimary>
+      <Muted :stream="stream" />
       <ThemeToggle />
     </div>
   </div>
