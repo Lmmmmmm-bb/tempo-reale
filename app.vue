@@ -77,11 +77,6 @@ const handleMuted = () => {
       rich-colors
       close-button
       position="bottom-right"
-      :toast-options="{
-        style: {
-          transition: 'all 0.3s ease-out',
-        },
-      }"
       :theme="colorMode.preference"
     />
   </ClientOnly>
