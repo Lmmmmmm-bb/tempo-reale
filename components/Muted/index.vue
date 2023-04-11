@@ -25,7 +25,6 @@ const handleMuted = () => {
   <ButtonPrimary
     flex
     mx-2 w-24 xl:w-36
-    transition-width duration-500 ease-out
     @click="handleMuted"
   >
     <Icon m-auto :name="isMuted ? 'carbon:microphone' : 'carbon:microphone-off'" />
