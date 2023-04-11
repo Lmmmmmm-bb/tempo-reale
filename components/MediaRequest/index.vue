@@ -5,18 +5,11 @@ const emits = defineEmits<{
   (e: 'onMedia', stream: MediaStream): void;
 }>();
 
-const stream = shallowRef<MediaStream>();
-
 const handleRequestMedia = async () => {
-  if (stream.value) {
-    return;
-  }
-
   requestMedia().then((mediaStream) => {
-    stream.value = mediaStream;
     emits('onMedia', mediaStream);
-  }).catch((err) => {
-    toast.error(err.message);
+  }).catch(() => {
+    toast.error('Permission denied or No device found');
   });
 };
 </script>
