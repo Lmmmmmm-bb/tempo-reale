@@ -15,7 +15,11 @@ const handleRequestMedia = async () => {
 </script>
 
 <template>
-  <ButtonSecondary flex @click="handleRequestMedia">
+  <Button
+    flex
+    type="success"
+    @click="handleRequestMedia"
+  >
     <Icon m-auto name="carbon:link" />
-  </ButtonSecondary>
+  </Button>
 </template>

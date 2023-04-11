@@ -22,11 +22,11 @@ const handleMuted = () => {
 </script>
 
 <template>
-  <ButtonPrimary
+  <Button
     flex
     mx-2 w-24 xl:w-36
     @click="handleMuted"
   >
     <Icon m-auto :name="isMuted ? 'carbon:microphone' : 'carbon:microphone-off'" />
-  </ButtonPrimary>
+  </Button>
 </template>
