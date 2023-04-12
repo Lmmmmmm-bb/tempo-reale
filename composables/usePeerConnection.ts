@@ -79,8 +79,13 @@ export const usePeerConnection = ({ stream, onTrack, onLeave }: UsePeerConnectio
     });
   };
 
+  const disconnect = () => {
+    socket.value?.socket.close();
+  };
+
   return {
     connect,
+    disconnect,
     socket,
     connectionMap,
   };

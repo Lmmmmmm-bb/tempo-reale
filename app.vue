@@ -5,8 +5,9 @@ const stream = ref<MediaStream>();
 const audioWrapperRef = ref<HTMLAudioElement>();
 
 const colorMode = useColorMode();
+const [isMuted, toggleIsMuted] = useToggle();
 const { target, targetStyle } = useLogoParallax();
-const { connect } = usePeerConnection({
+const { connect, disconnect } = usePeerConnection({
   stream,
   onTrack: (id, e) => {
     const audio = document.getElementById(id);
@@ -25,10 +26,12 @@ const { connect } = usePeerConnection({
 });
 
 const handleGetStream = (mediaStream: MediaStream) => {
-  if (!stream.value) {
-    stream.value = mediaStream;
-    connect();
-  }
+  stream.value = mediaStream;
+  connect();
+};
+
+const handleDisconnect = () => {
+  disconnect();
 };
 </script>
 
@@ -45,8 +48,16 @@ const handleGetStream = (mediaStream: MediaStream) => {
       />
     </div>
     <div flex>
-      <MediaRequest @on-media="handleGetStream" />
-      <Muted :stream="stream" />
+      <Connect
+        :stream="stream"
+        @on-media="handleGetStream"
+        @on-disconnect="handleDisconnect"
+      />
+      <Muted
+        :is-muted="isMuted"
+        :stream="stream"
+        @on-mute="toggleIsMuted"
+      />
       <ThemeToggle />
     </div>
   </div>
