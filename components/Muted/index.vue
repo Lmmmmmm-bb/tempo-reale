@@ -1,18 +1,22 @@
 <script setup lang="ts">
 const props = defineProps<{
+  isMuted: boolean;
   stream: MediaStream | undefined;
 }>();
 
+const emits = defineEmits<{
+  (e: 'onMute', isMuted: boolean): void;
+}>();
+
 const { $toast } = useNuxtApp();
-const [isMuted, toggleIsMuted] = useToggle(true);
 
 const handleMuted = () => {
   const { stream } = props;
   if (stream) {
     stream.getAudioTracks().forEach(
-      track => track.enabled = isMuted.value,
+      track => track.enabled = props.isMuted,
     );
-    toggleIsMuted();
+    emits('onMute', !props.isMuted);
   } else {
     $toast('No Microphone Permission', {
       description: 'Please allow microphone access first.',
@@ -27,6 +31,6 @@ const handleMuted = () => {
     mx-2 w-24 xl:w-36
     @click="handleMuted"
   >
-    <Icon m-auto :name="isMuted ? 'carbon:microphone' : 'carbon:microphone-off'" />
+    <Icon m-auto :name="props.isMuted ? 'carbon:microphone' : 'carbon:microphone-off'" />
   </Button>
 </template>
