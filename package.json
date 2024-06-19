@@ -1,6 +1,6 @@
 {
   "name": "tempo-reale",
-  "packageManager": "pnpm@9.0.6",
+  "packageManager": "pnpm@9.2.0",
   "license": "MIT",
   "scripts": {
     "build": "nuxt build",
@@ -21,9 +21,9 @@
     "@nuxtjs/color-mode": "^3.4.1",
     "@nuxtjs/device": "^3.1.1",
     "@nuxtjs/google-fonts": "^3.2.0",
-    "@unocss/nuxt": "^0.59.4",
-    "@vueuse/nuxt": "^10.9.0",
-    "eslint": "^9.1.1",
+    "@unocss/nuxt": "^0.60.4",
+    "@vueuse/nuxt": "^10.10.0",
+    "eslint": "^9.4.0",
     "nuxt": "3.7.4",
     "nuxt-icon": "^0.6.10",
     "typescript": "^5.4.5"
