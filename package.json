@@ -1,6 +1,6 @@
 {
   "name": "tempo-reale",
-  "packageManager": "pnpm@9.2.0",
+  "packageManager": "pnpm@9.4.0",
   "license": "MIT",
   "scripts": {
     "build": "nuxt build",
@@ -12,20 +12,20 @@
   },
   "dependencies": {
     "socket.io-client": "^4.7.5",
-    "vue-sonner": "^1.1.2"
+    "vue-sonner": "^1.1.3"
   },
   "devDependencies": {
     "@lmmmmmm/eslint-config": "^0.3.0",
     "@lmmmmmm/eslint-config-vue": "^0.3.0",
     "@nuxt/image-edge": "1.0.0-rc.3-28277678.46975fe",
-    "@nuxtjs/color-mode": "^3.4.1",
+    "@nuxtjs/color-mode": "^3.4.2",
     "@nuxtjs/device": "^3.1.1",
     "@nuxtjs/google-fonts": "^3.2.0",
-    "@unocss/nuxt": "^0.60.4",
-    "@vueuse/nuxt": "^10.10.0",
-    "eslint": "^9.4.0",
+    "@unocss/nuxt": "^0.61.0",
+    "@vueuse/nuxt": "^10.11.0",
+    "eslint": "^9.6.0",
     "nuxt": "3.7.4",
-    "nuxt-icon": "^0.6.10",
-    "typescript": "^5.4.5"
+    "nuxt-icon": "^1.0.0-beta.7",
+    "typescript": "^5.5.3"
   }
 }
