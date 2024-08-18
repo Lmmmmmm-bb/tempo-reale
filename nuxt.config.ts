@@ -10,10 +10,10 @@ export default defineNuxtConfig({
     '@nuxtjs/google-fonts',
     '@unocss/nuxt',
     '@nuxtjs/color-mode',
-    'nuxt-icon',
     '@nuxtjs/device',
     '@vueuse/nuxt',
-    '@nuxt/image-edge',
+    "@nuxt/icon",
+    "@nuxt/image"
   ],
   build: {
     transpile: ['vue-sonner'],
