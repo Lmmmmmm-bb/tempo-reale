@@ -32,9 +32,6 @@ export default defineNuxtConfig({
     preconnect: true,
     preload: true,
   },
-  device: {
-    refreshOnResize: true,
-  },
   app: {
     head: {
       htmlAttrs: {
